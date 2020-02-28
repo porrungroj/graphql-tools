@@ -99,12 +99,12 @@ function addMockFunctionsToSchema({
     // 2. if the nullableType is a list, recurse
     // 2. if there's a mock defined for this typeName, that will be used
     // 3. if there's no mock defined, use the default mocks for this type
-    return (
+    return async (
       root: any,
       args: { [key: string]: any },
       context: any,
       info: GraphQLResolveInfo,
-    ): any => {
+    ): Promise<any> => {
       // nullability doesn't matter for the purpose of mocking.
       const fieldType = getNullableType(type) as GraphQLNullableType;
       const namedFieldType = getNamedType(fieldType);
@@ -114,7 +114,7 @@ function addMockFunctionsToSchema({
 
         // if we're here, the field is already defined
         if (typeof root[fieldName] === 'function') {
-          result = root[fieldName](root, args, context, info);
+          result = await root[fieldName](root, args, context, info);
           if (result instanceof MockList) {
             result = result.mock(
               root,
